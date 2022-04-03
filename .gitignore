@@ -1,3 +1,7 @@
+debug.py
+./debug.py
+app/debug.py
+./app/debug.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
