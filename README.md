@@ -6,3 +6,4 @@
 4. install the dependencies `poetry install`
 5. Run the FastAPI server via poetry `poetry run ./run.sh`
 6. Open http://localhost:8001/
+
