@@ -66,7 +66,7 @@ async def islamiska_forbundet_get_locations() -> List[str]:
 
 @router.get("/islamiska-forbundet", status_code=200, response_model=PrayerTimeFullYear)
 async def islamiska_forbundet_fetch_prayertimes(city: str) -> PrayerTimeFullYear:
-    
+    city = city.capitalize()
     if city not in IslamiskaForbundet.get_locations():
         raise HTTPException(
             status_code=404,
