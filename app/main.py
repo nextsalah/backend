@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.api_v1.api import api_router
 from app.core.config import settings
@@ -14,6 +15,13 @@ root_router = APIRouter()
 app = FastAPI(title="NextSalah API")
 
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @root_router.get("/", status_code=200)
 def root(request: Request):
