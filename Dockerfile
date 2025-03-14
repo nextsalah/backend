@@ -2,9 +2,12 @@
 FROM python:3.11-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV PIP_NO_CACHE_DIR 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    APP_MODULE=app.main:app \
+    HOST=0.0.0.0 \
+    PORT=80
 
 # Set the working directory in the container
 WORKDIR /app
@@ -12,6 +15,7 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
@@ -27,7 +31,10 @@ COPY pyproject.toml poetry.lock* ./
 RUN poetry config virtualenvs.create false
 
 # Install project dependencies
-RUN poetry install --no-interaction --no-ansi
+# Use pip as a fallback if Poetry fails
+RUN poetry install --no-interaction --no-ansi || \
+    (echo "Poetry installation failed, falling back to pip" && \
+    pip install $(grep -E '^[a-zA-Z0-9-]+' pyproject.toml | sed -E 's/=.*//'))
 
 # Copy the rest of the application code
 COPY . .
