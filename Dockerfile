@@ -16,7 +16,11 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     curl \
     build-essential \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and setuptools
+RUN pip install --upgrade pip setuptools wheel
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -27,14 +31,14 @@ ENV PATH="${PATH}:/root/.local/bin"
 # Copy only the files needed for dependency installation
 COPY pyproject.toml poetry.lock* ./
 
-# Configure Poetry to not create a virtual environment
+# Configure Poetry
 RUN poetry config virtualenvs.create false
 
-# Install project dependencies
-# Use pip as a fallback if Poetry fails
-RUN poetry install --no-interaction --no-ansi || \
-    (echo "Poetry installation failed, falling back to pip" && \
-    pip install $(grep -E '^[a-zA-Z0-9-]+' pyproject.toml | sed -E 's/=.*//'))
+# Install dependencies using pip as a fallback
+RUN pip install poetry && \
+    (poetry install --no-interaction --no-ansi || \
+    (echo "Poetry installation failed, attempting manual package installation" && \
+    pip install fastapi uvicorn requests beautifulsoup4 httptools))
 
 # Copy the rest of the application code
 COPY . .
